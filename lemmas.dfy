@@ -4,23 +4,33 @@ lemma trivial_increasing (s : seq<int>)
   ensures |s| < 2 ==> sorted (s)
   {}
 
-lemma {:axiom} increasing_sub (s : seq<int>, l: int, r : int, i : int, j : int)
+lemma increasing_sub (s : seq<int>, l: int, r : int, i : int, j : int)
   requires 0 <= l <= i <= j <= r <= |s|
   requires sorted (s[l..r])
   ensures  sorted (s[i..j])
+  {
+    assert (l <= i < j < r ==> s[i] <= s[j]);
+  }
 
-lemma {:axiom} increasing_sub_leqs (s : seq<int>, l: int, r : int, m : int)
+lemma increasing_sub_leqs (s : seq<int>, l: int, r : int, m : int)
   requires 0 <= l <= m < r <= |s|
   requires sorted (s[l..m])
   requires sorted (s[m+1..r])
   requires leqs_elem (s[l..m], s[m])
   requires elem_leqs (s[m], s[m+1..r])
   ensures sorted (s[l..r])
+  {
+    assert (forall h : int, k : int :: l <= h < k < r ==> s[h] <= s[k]);
+  }
 
-lemma {:axiom} increasing_sub_leqs_elem (s : seq<int>, l: int, r : int, m : int)
+lemma increasing_sub_leqs_elem (s : seq<int>, l: int, r : int, m : int)
   requires 0 <= l <= m < r <= |s|
   requires sorted (s[l..r])
   ensures  leqs_elem (s[l..m], s[m]) && elem_leqs (s[m], s[m..r])
+  {
+    assert (forall h : int, k : int :: l <= h < k < r ==> s[h] <= s[k]);
+  }
+
 
 lemma leqs_elem_sum (s : seq<int>, s' : seq<int>, x : int)
   requires leqs_elem (s, x) && leqs_elem (s', x)

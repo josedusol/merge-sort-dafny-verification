@@ -1,6 +1,7 @@
 include "../predicates.dfy"
 include "../lemmas.dfy"
-include "../merge/mIT_cIT.dfy"
+include "../merge/mIT.dfy"
+include "../copy/cIT.dfy"
 
 method mergeSort (a : array<int>)
   modifies a
@@ -53,20 +54,20 @@ method merges (a : array<int>, s : int)
       }
       assert a.Length <= j+s ==> a.Length <= j+2*s ;
     }
-    label merge_pair :
-    merge_pair (a, j, s) ;
+    label mergePair :
+    mergePair (a, j, s) ;
     forall l : int | 0 <= l < min(j+2*s, a.Length) && l%(2*s) == 0
       ensures sorted (a[l .. min(l+2*s, a.Length)])
     {
       if l < j {
-        assert a[0..j] == old@merge_pair(a[0..j]) ;
+        assert a[0..j] == old@mergePair(a[0..j]) ;
         assert l < j ;
         assert 0 <= l < l+2*s <= j < a.Length by {mod2n_ii (j, l, 2*s) ;}
-        subseq_eq (a[0..j], old@merge_pair(a[0..j]), l, min(l+2*s, a.Length)) ;
+        subseq_eq (a[0..j], old@mergePair(a[0..j]), l, min(l+2*s, a.Length)) ;
         assert a[l .. min(l+2*s, a.Length)] == (a[0..j])[l .. min(l+2*s, a.Length)] by {sub_subseq (a[..], 0, j, l, min(l+2*s, a.Length)) ;}
-        assert (a[0..j])[l .. min(l+2*s, a.Length)] == old@merge_pair((a[0..j])[l .. min(l+2*s, a.Length)]) ;
-        assert old@merge_pair((a[0..j])[l .. min(l+2*s, a.Length)]) == old@merge_pair(a[l .. min(l+2*s, a.Length)]) by {sub_subseq (old@merge_pair(a[..]), 0, j, l, min(l+2*s, a.Length)) ;}
-        assert sorted (old@merge_pair(a[l .. min(l+2*s, a.Length)])) ;
+        assert (a[0..j])[l .. min(l+2*s, a.Length)] == old@mergePair((a[0..j])[l .. min(l+2*s, a.Length)]) ;
+        assert old@mergePair((a[0..j])[l .. min(l+2*s, a.Length)]) == old@mergePair(a[l .. min(l+2*s, a.Length)]) by {sub_subseq (old@mergePair(a[..]), 0, j, l, min(l+2*s, a.Length)) ;}
+        assert sorted (old@mergePair(a[l .. min(l+2*s, a.Length)])) ;
         assert sorted (a[l .. min(l+2*s, a.Length)]) ;
       }
       else {
@@ -89,19 +90,19 @@ method merges (a : array<int>, s : int)
     forall l : int | j <= l < a.Length && l%s == 0
       ensures sorted (a[l .. min(l+s, a.Length)])
     {
-      assert a[j .. a.Length] == old@merge_pair(a[j .. a.Length]) ;
+      assert a[j .. a.Length] == old@mergePair(a[j .. a.Length]) ;
       assert 0 <= l-j < min(l+s, a.Length)-j <= a.Length-j by {assert l < l+s && l < a.Length ;}
-      subseq_eq (a[j .. a.Length], old@merge_pair(a[j .. a.Length]), l-j, min(l+s, a.Length)-j) ;
+      subseq_eq (a[j .. a.Length], old@mergePair(a[j .. a.Length]), l-j, min(l+s, a.Length)-j) ;
       assert a[l .. min(l+s, a.Length)] == (a[j..a.Length])[l-j .. min(l+s, a.Length)-j] by {sub_subseq (a[..], j, a.Length, l, min(l+s, a.Length)) ;}
-      assert (a[j..a.Length])[l-j .. min(l+s, a.Length)-j] == old@merge_pair((a[j..a.Length])[l-j .. min(l+s, a.Length)-j]) ;
-      assert old@merge_pair((a[j..a.Length])[l-j .. min(l+s, a.Length)-j]) == old@merge_pair(a[l..min(l+s, a.Length)]) by {sub_subseq (old@merge_pair(a[..]), j, a.Length, l, min(l+s, a.Length)) ;}
-      assert sorted (old@merge_pair(a[l .. min(l+s, a.Length)])) ;
+      assert (a[j..a.Length])[l-j .. min(l+s, a.Length)-j] == old@mergePair((a[j..a.Length])[l-j .. min(l+s, a.Length)-j]) ;
+      assert old@mergePair((a[j..a.Length])[l-j .. min(l+s, a.Length)-j]) == old@mergePair(a[l..min(l+s, a.Length)]) by {sub_subseq (old@mergePair(a[..]), j, a.Length, l, min(l+s, a.Length)) ;}
+      assert sorted (old@mergePair(a[l .. min(l+s, a.Length)])) ;
       assert sorted (a[l .. min(l+s, a.Length)]) ;
     }
   }
 }
 
-method {:axiom} merge_pair (a : array<int>, l : int, s : int)
+method {:isolate_assertions} {:timeLimitMultiplier 10} mergePair (a : array<int>, l : int, s : int)
   modifies a
   requires 0 <= l < a.Length
   requires s >= 1
@@ -111,6 +112,29 @@ method {:axiom} merge_pair (a : array<int>, l : int, s : int)
   ensures perm (a[..], old(a[..]))
   ensures a[0..l] == old(a[0..l])
   ensures a[min (l+2*s, a.Length)..a.Length] == old(a[min (l+2*s, a.Length)..a.Length])
+  {
+    if (l+s >= a.Length){}
+    else{
+      var aa := new int[s];
+      var s' := min(s,a.Length-(l+s));
+      var aa' := new int[s'];
+      var a' := new int[s+s'];
+
+      copy(a,l,aa,0,s);
+      assert old(a[l..l+s])==aa[0..s];
+
+      copy(a,l+s,aa',0,s');
+      assert old(a[l+s..l+s+s'])==aa'[0..s'];
+      assert old(a[l..l+s+s'])==aa[0..s]+aa'[0..s'];
+
+      merge(aa,aa',a');
+
+      copy(a',0,a,l,s+s');
+      assert a[..] == a[0..l]+a[l..l+s+s']+a[l+s+s'..a.Length];
+      assert old(a[..]) == old(a[0..l]+a[l..l+s+s']+a[l+s+s'..a.Length]);
+      assert perm(a[..],old(a[..]));
+    }
+  }
 
 function min (x : int, y : int) : (m : int)
   ensures m <= x
