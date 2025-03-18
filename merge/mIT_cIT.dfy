@@ -15,9 +15,9 @@ method {:isolate_assertions} {:timeLimitMultiplier 10} merge (a: array<int>, l: 
   var left  := new int[n1];
   var right := new int[n2];
 
-  left := copy(a,l,left,0,n1);
-  right := copy(a,m+1,right,0,n2);
-
+  copy(a,l,left,0,n1);
+  copy(a,m+1,right,0,n2);
+  assert unch(a[..],old(a[..]),l,r);
   assert (left[0..n1]==old(a[l..m+1]) && right[0..n2]==old(a[m+1..r+1]));
 
   var i, j, k := 0, 0, l;
