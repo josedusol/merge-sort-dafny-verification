@@ -2,12 +2,13 @@
 include "../predicates.dfy"
 include "../lemmas.dfy"
 
-method {:timeLimitMultiplier 2} BS(A:array<int>, l:int, r:int, x:int) returns (i:int)
+method {:timeLimitMultiplier 2} bs(A:array<int>, l:int, r:int, x:int) returns (i:int)
   requires 0 <= l <= r <= A.Length
   requires sorted(A[l..r]) 
-  ensures l <= i <= r
+  ensures 0 <= l <= i <= r <= A.Length
   ensures leqs_elem(A[l..i], x)
   ensures elem_leqs(x, A[i..r])
+  ensures A[..] == old(A[..])
 {
   i := l; var j := r;
   while i != j
