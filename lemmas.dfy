@@ -16,19 +16,35 @@ lemma sub_increasing (s : seq<int>, l: int, r : int, m : int)
  }
 }
 
-        lemma {:axiom} perm_leqs (s : seq<int>, t : seq<int>, s' : seq<int>, t' : seq<int>)
-          requires leqs (s, t)
-          requires perm (s, s') && perm (t, t')
-          ensures leqs (s', t')
+lemma {:axiom} perm_leqs (s : seq<int>, t : seq<int>, s' : seq<int>, t' : seq<int>)
+  requires leqs (s, t)
+  requires perm (s, s') && perm (t, t')
+  ensures leqs (s', t')
+{
+  forall i,j | 0 <= i < |s'| && 0 <= j < |t'|
+    ensures s'[i] <= t'[j]
+  {
+    assert exists i' : int :: 0 <= i' < |s| && s'[i] == s[i'] by {
+      assert s'[i] in (set x | x in multiset(s));
+    }
+    assert exists j' : int :: 0 <= j' < |t| && t'[j] == t[j'] by {
+      assert t'[j] in (set x | x in multiset(t));
+    }
+  }
+}
             
-            lemma {:axiom} perm_exists (s : seq<int>, s' : seq<int>)
-            requires perm (s, s')
-            requires |s| > 0
-            ensures forall i :: 0 <= i < |s| ==> exists  j :: 0 <= j < |s'| && s[i] == s'[j]
-            /*{
-              assert(multiset(s) == multiset(s'));
-              assert forall x :: x in s ==> x in s' by {assert perm (s, s');} 
-            } */
+lemma perm_exists (s : seq<int>, s' : seq<int>)
+requires perm (s, s')
+requires |s| > 0
+ensures forall i :: 0 <= i < |s| ==> exists  j :: 0 <= j < |s'| && s[i] == s'[j]
+{
+  forall i | 0 <= i < |s|
+    ensures exists  j :: 0 <= j < |s'| && s[i] == s'[j]
+    {
+      assert s[i] in s;
+      assert s[i] in (set x | x in multiset(s'));
+    }
+} 
 
 lemma sub_leqs (s : seq<int>, l: int, r : int, m : int)
   requires 0 <= l <= m <= r <= |s|  

@@ -2,6 +2,8 @@ include "../predicates.dfy"
 include "../lemmas.dfy"
 include "../binary_search/bsREC_tato.dfy"
 
+
+
 method /*{:isolate_assertions}*/ merge (a : array<int>, l : int, r : int, b : array<int>, l' : nat, r' : nat) returns (c : array<int>)
 requires 0 <= l <= r <= a.Length
 requires 0 <= l' <= r' <= b.Length
@@ -12,6 +14,7 @@ ensures sorted (c[..])
 ensures perm (a[l..r]+b[l'.. r'], c[..])
 ensures a[l..r] == old(a[l..r])
 ensures b[l'..r'] == old(b[l'..r'])
+ensures a != c
 decreases r-l
 {
     if r-l == 0 {
