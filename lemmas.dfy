@@ -4,6 +4,48 @@ lemma trivial_increasing (s : seq<int>)
   ensures |s| < 2 ==> sorted (s)
 {}
 
+lemma sub_increasing (s : seq<int>, l: int, r : int, m : int)
+  requires 0 <= l <= m <= r <= |s|
+  requires sorted (s[l..r])
+  ensures sorted (s[l..m])
+  ensures sorted (s[m..r])
+{forall i, j | l <= i <= j < m
+   ensures s[i] <= s[j]{
+   assert sorted (s[l..r]) ;
+   assert l <= i <= j < m <= r ;
+ }
+}
+
+        lemma {:axiom} perm_leqs (s : seq<int>, t : seq<int>, s' : seq<int>, t' : seq<int>)
+          requires leqs (s, t)
+          requires perm (s, s') && perm (t, t')
+          ensures leqs (s', t')
+            
+            lemma {:axiom} perm_exists (s : seq<int>, s' : seq<int>)
+            requires perm (s, s')
+            requires |s| > 0
+            ensures forall i :: 0 <= i < |s| ==> exists  j :: 0 <= j < |s'| && s[i] == s'[j]
+            /*{
+              assert(multiset(s) == multiset(s'));
+              assert forall x :: x in s ==> x in s' by {assert perm (s, s');} 
+            } */
+
+lemma sub_leqs (s : seq<int>, l: int, r : int, m : int)
+  requires 0 <= l <= m <= r <= |s|  
+  requires sorted (s[l..r])
+  ensures leqs (s[l..m], s[m..r])
+{forall i, j | l <= i < m && m <= j < r
+   ensures s[i] <= s[j]{
+   assert sorted (s[l..r]) ;
+   assert l <= i < m <= j < r ;
+ }
+}
+
+lemma {:axiom} sum_leqs(a : seq<int>, a' : seq<int>, b : seq<int>, b': seq<int>)
+requires leqs(a,a')
+requires leqs(b,b')
+ensures leqs(a+b, a'+b')
+
 lemma increasing_sub (s : seq<int>, l: int, r : int, i : int, j : int)
   requires 0 <= l <= i <= j <= r <= |s|
   requires sorted (s[l..r])
@@ -41,52 +83,6 @@ lemma elem_leqs_sum (s : seq<int>, s' : seq<int>, x : int)
   requires elem_leqs (x, s) && elem_leqs (x, s')
   ensures elem_leqs (x, s + s')
 {}
-
-lemma elem_leqs_sub (s : seq<int>, l : int, r : int, m : int, x : int)
-  requires 0 <= l < m <= r <= |s|
-  requires sorted (s[l..r])
-  ensures elem_leqs (x, s[l..m]) ==> elem_leqs (x, s[l..r])
-  {
-    calc{
-      sorted(s[l..r]) && elem_leqs (x, s[l..m]);
-
-      ==> {assert (forall h : int, k : int :: l <= h < k < m ==> s[h] <= s[k]);}
-
-      sorted(s[l..m]) && elem_leqs (x, s[l..m]);
-      
-      ==> 
-
-      x <= s[l];
-
-      ==> 
-
-      elem_leqs (x, s[l..r]);
-
-    }    
-  }
-
-lemma leqs_elem_sub (s : seq<int>, l : int, r : int, m : int, x : int)
-  requires 0 <= l <= m < r <= |s|
-  requires sorted (s[l..r])
-  ensures leqs_elem (s[m..r], x) ==> leqs_elem (s[l..r], x)
-  {
-    calc{
-      sorted(s[l..r]) && leqs_elem (s[m..r],x);
-
-      ==> {assert (forall h : int, k : int :: l <= h < k < m ==> s[h] <= s[k]);}
-
-      sorted(s[l..m]) && leqs_elem (s[m..r], x);
-      
-      ==> 
-
-      s[r-1] <= x;
-
-      ==> 
-
-      leqs_elem (s[l..r], x);
-
-    }    
-  }
 
 lemma perm_refl (s : seq<int>)
   ensures perm (s, s)
@@ -135,6 +131,18 @@ lemma elem_leqs_perm (s : seq<int>, s' : seq<int>, x : int)
     }
   }
 }
+
+lemma maximum (a : seq<int>,l : int, r : int)
+  requires 0 <= l <= r <= |a|
+  requires sorted (a[l..r])
+  ensures r-l > 0 ==> leqs_elem(a[l..r],a[r-1])
+{}
+
+lemma minimum (a : seq<int>,l : int, r : int)
+  requires 0 <= l <= r <= |a|
+  requires sorted (a[l..r])
+  ensures r-l > 0 ==> elem_leqs(a[l],a[l..r])
+{}
 
 lemma subseq_eq (a : seq<int>, b : seq<int>, l : int, r : int)
   requires a == b

@@ -1,6 +1,6 @@
 include "../predicates.dfy"
 include "../lemmas.dfy"
-include "../binary_search/bsDC.dfy"
+include "../binary_search/bsREC.dfy"
 
 method {:isolate_assertions} merge (a : array<int>, l : int, r : int, b : array<int>, l' : int, r' : int) returns (c : array<int>)
   requires 0 <= l <= r <= a.Length
@@ -30,8 +30,8 @@ method {:isolate_assertions} merge (a : array<int>, l : int, r : int, b : array<
       assert leqs_elem (a[l..m], a[m]) ;
       assert elem_leqs (a[m], a[m..r]) ;
 
-      var m' := bs (a[m], b[..], l', r') ;
-
+      var m' := bs (a[m], b[..], l', r');
+        
       assert leqs_elem (b[l'..m'], a[m]) ;
       assert elem_leqs (a[m], b[m'..r']) ;
 
@@ -78,6 +78,7 @@ method {:isolate_assertions} merge (a : array<int>, l : int, r : int, b : array<
       assert a[l..r] == a[l..m]+a[m..r] == a[l..m] + [a[m]] + a[m+1..r];
       assert b[l'.. r'] == b[l'..m']+b[m'..r'] ;
       assert perm (a[l..r]+b[l'.. r'], d[0..d.Length] + [a[m]] + d'[0..d'.Length]) ;
+      
     }
   }
 }
