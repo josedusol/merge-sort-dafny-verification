@@ -16,6 +16,18 @@ lemma sub_increasing (s : seq<int>, l: int, r : int, m : int)
  }
 }
 
+lemma {:axiom} sub_eq (a : seq<int>, a' : seq<int>, l : int, m : int, r : int)
+  requires 0 <= l <= m <= r <= |a|
+  requires 0 <= l <= m <= r <= |a'|
+  requires a[l..r] == a'[l..r]
+  ensures a[l..m] == a'[l..m]
+  ensures a[m..r] == a'[m..r]
+
+lemma {:axiom} perm_sum (s : seq<int>, t : seq<int>, s' : seq<int>, t' : seq<int>)
+  requires perm (s, t)
+  requires perm (s', t')
+  ensures leqs (s+s',t+t')
+
 lemma perm_leqs (s : seq<int>, t : seq<int>, s' : seq<int>, t' : seq<int>)
   requires leqs (s, t)
   requires perm (s, s') && perm (t, t')
@@ -174,7 +186,6 @@ lemma sub_subseq (a : seq<int>, l : int, r : int, l' : int, r' : int)
   assert l' == l+l'-l;
   assert r' == l+(l'-l)+(r'-l');
 }
-
 
 lemma {:axiom} modn_i (x : int, n : int)
   requires x >= 0 && n > 0
