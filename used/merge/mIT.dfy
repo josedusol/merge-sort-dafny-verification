@@ -1,7 +1,6 @@
-
 include "../predicates.dfy"
 
-method {:isolate_assertions} {:timeLimitMultiplier 10} merge(a:array<int>, b:array<int>, c:array<int>)
+method {:isolate_assertions} merge(a:array<int>, b:array<int>, c:array<int>)
   requires sorted(a[..]) && sorted(b[..])
   requires c.Length == a.Length + b.Length 
   modifies c
@@ -52,5 +51,4 @@ method {:isolate_assertions} {:timeLimitMultiplier 10} merge(a:array<int>, b:arr
       j, k := j+1, k+1;
     }
   }
-  assert i == a.Length && j == b.Length && k == i + j == c.Length;
 }

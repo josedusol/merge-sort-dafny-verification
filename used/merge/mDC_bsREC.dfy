@@ -1,10 +1,10 @@
 include "../predicates.dfy"
 include "../lemmas.dfy"
-include "../binary_search/bsREC_tato.dfy"
+include "../binary_search/bsREC.dfy"
 
 
 
-method /*{:isolate_assertions}*/ merge (a : array<int>, l : int, r : int, b : array<int>, l' : nat, r' : nat) returns (c : array<int>)
+method {:isolate_assertions} mergeGen (a : array<int>, l : int, r : int, b : array<int>, l' : nat, r' : nat) returns (c : array<int>)
 requires 0 <= l <= r <= a.Length
 requires 0 <= l' <= r' <= b.Length
 requires sorted (a[l..r])
@@ -53,9 +53,9 @@ decreases r-l
             }
             label before_merges :
         var d : array<int> := new int[m-l + m'-l'] ;   
-        d := merge (a, l, m, b, l', m') ;
+        d := mergeGen (a, l, m, b, l', m') ;
         var d' : array<int> := new int[r-(m+1) + r'-m'] ;
-        d' := merge (a, m+1, r, b, m', r') ;
+        d' := mergeGen (a, m+1, r, b, m', r') ;
             assert leqs (d[..], d'[..]) 
             by {assert a[l..r] == old@before_merges(a[l..r]) && b[l'..r'] == old@before_merges(b[l'..r']);
                 assert leqs(a[l..m],a[m+1..r]);
