@@ -48,11 +48,11 @@ method merge_sort' (a : array<int>, l : int, r : int)
          }
       perm(a[l..r], old@bfr(a[l..r]));
     }
-    merge (a, l, m, r) ;
+    merge' (a, l, m, r) ;
   }
 }
 
-method {:axiom} merge (a : array<int>, l : int, m : int, r : int)
+method {:axiom} merge' (a : array<int>, l : int, m : int, r : int)
   modifies a
   requires 0 <= l < m < r <= a.Length
   requires sorted (a[l..m]) && sorted (a[m..r])
@@ -60,7 +60,7 @@ method {:axiom} merge (a : array<int>, l : int, m : int, r : int)
   ensures perm (a[l..r], old(a[l..r]))
   ensures a[0..l] == old (a[0..l]) && a[r..a.Length] == old (a[r..a.Length])
 {
-    var c := mergeGen(a,l,m,a,m,r);
+    var c := merge(a,l,m,a,m,r);
     assert a[l..r]==a[l..m]+a[m..r];
     assert perm(a[l..r],c[..]);
     assert c[..] == c[0..c.Length];

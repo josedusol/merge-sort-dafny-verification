@@ -2,7 +2,7 @@ include "../predicates.dfy"
 include "../lemmas.dfy"
 include "../find_place/fpREC.dfy"
 
-method mergeGen (a : array<int>, l : int, r : int, b : array<int>, l' : nat, r' : nat) returns (c : array<int>)
+method merge (a : array<int>, l : int, r : int, b : array<int>, l' : nat, r' : nat) returns (c : array<int>)
   requires 0 <= l <= r <= a.Length
   requires 0 <= l' <= r' <= b.Length
   requires sorted (a[l..r])
@@ -55,9 +55,9 @@ method mergeGen (a : array<int>, l : int, r : int, b : array<int>, l' : nat, r' 
       }
       label bfr :
       var d : array<int> := new int[m-l + m'-l'] ;
-      d := mergeGen (a, l, m, b, l', m') ;
+      d := merge (a, l, m, b, l', m') ;
       var d' : array<int> := new int[r-(m+1) + r'-m'] ;
-      d' := mergeGen (a, m+1, r, b, m', r') ;
+      d' := merge (a, m+1, r, b, m', r') ;
       assert leqs (d[..], d'[..])
       by {
         assert a[l..r] == old@bfr(a[l..r]) && b[l'..r'] == old@bfr(b[l'..r']);
