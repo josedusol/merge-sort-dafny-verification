@@ -48,7 +48,7 @@ method merges (a : array<int>, s : int)
           modn (j, s) ;
         }
       }
-    label mergePair :
+    label bfr :
     mergePair (a, j, s) ;
       forall l : int | 0 <= l < min(j+2*s, a.Length) && l%(2*s) == 0
         ensures sorted (a[l..min(l+2*s, a.Length)])
@@ -58,8 +58,8 @@ method merges (a : array<int>, s : int)
           assert a[l..min(l+2*s, a.Length)]==(a[0..j])[l..min(l+2*s, a.Length)] by {
             sub_subseq (a[..], 0, j, l, min(l+2*s, a.Length)) ;
           }
-          assert old@mergePair((a[0..j])[l..min(l+2*s, a.Length)])==old@mergePair(a[l..min(l+2*s, a.Length)]) by {
-            sub_subseq (old@mergePair(a[..]), 0, j, l, min(l+2*s, a.Length)) ;
+          assert old@bfr((a[0..j])[l..min(l+2*s, a.Length)])==old@bfr(a[l..min(l+2*s, a.Length)]) by {
+            sub_subseq (old@bfr(a[..]), 0, j, l, min(l+2*s, a.Length)) ;
           }
         } else {
           mod2n_iii (j, l, 2*s) ;
@@ -81,8 +81,8 @@ method merges (a : array<int>, s : int)
         assert a[l .. min(l+s, a.Length)] == (a[j..a.Length])[l-j .. min(l+s, a.Length)-j] by {
           sub_subseq (a[..], j, a.Length, l, min(l+s, a.Length)) ;
         }
-        assert old@mergePair((a[j..a.Length])[l-j .. min(l+s, a.Length)-j]) == old@mergePair(a[l..min(l+s, a.Length)]) by {
-          sub_subseq (old@mergePair(a[..]), j, a.Length, l, min(l+s, a.Length)) ;
+        assert old@bfr((a[j..a.Length])[l-j .. min(l+s, a.Length)-j]) == old@bfr(a[l..min(l+s, a.Length)]) by {
+          sub_subseq (old@bfr(a[..]), j, a.Length, l, min(l+s, a.Length)) ;
         }
       }
   }

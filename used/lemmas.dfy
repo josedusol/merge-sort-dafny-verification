@@ -1,10 +1,10 @@
 include "predicates.dfy"
 
-lemma trivial_increasing (s : seq<int>)
+lemma trivial_sorted (s : seq<int>)
   ensures |s| < 2 ==> sorted (s)
 {}
 
-lemma sub_increasing (s : seq<int>, l: int, r : int, m : int)
+lemma sub_sorted (s : seq<int>, l: int, r : int, m : int)
   requires 0 <= l <= m <= r <= |s|
   requires sorted (s[l..r])
   ensures sorted (s[l..m])
@@ -74,7 +74,7 @@ lemma {:axiom} sum_leqs(a : seq<int>, a' : seq<int>, b : seq<int>, b': seq<int>)
   requires leqs(b,b')
   ensures leqs(a+b, a'+b')
 
-lemma increasing_sub (s : seq<int>, l: int, r : int, i : int, j : int)
+lemma sorted_sub (s : seq<int>, l: int, r : int, i : int, j : int)
   requires 0 <= l <= i <= j <= r <= |s|
   requires sorted (s[l..r])
   ensures  sorted (s[i..j])
@@ -82,7 +82,7 @@ lemma increasing_sub (s : seq<int>, l: int, r : int, i : int, j : int)
   assert (l <= i < j < r ==> s[i] <= s[j]);
 }
 
-lemma increasing_sub_leqs (s : seq<int>, l: int, r : int, m : int)
+lemma sorted_sub_leqs (s : seq<int>, l: int, r : int, m : int)
   requires 0 <= l <= m < r <= |s|
   requires sorted (s[l..m])
   requires sorted (s[m+1..r])
@@ -93,7 +93,7 @@ lemma increasing_sub_leqs (s : seq<int>, l: int, r : int, m : int)
   assert (forall h : int, k : int :: l <= h < k < r ==> s[h] <= s[k]);
 }
 
-lemma increasing_sub_leqs_elem (s : seq<int>, l: int, r : int, m : int)
+lemma sorted_sub_leqs_elem (s : seq<int>, l: int, r : int, m : int)
   requires 0 <= l <= m < r <= |s|
   requires sorted (s[l..r])
   ensures  leqs_elem (s[l..m], s[m]) && elem_leqs (s[m], s[m..r])
